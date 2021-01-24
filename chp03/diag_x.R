@@ -9,5 +9,5 @@ boxplot(Graduates, main='Boxplot of Graduates')
 
 par(mfrow=c(1,1))
 
-plot(Graduates)
+plot(Graduates, main="Sequence plot")
 lines(Graduates)
