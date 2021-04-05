@@ -28,3 +28,12 @@ library(olsrr)
 ols_step_backward_p(fit0)
 ols_step_forward_p(fit0)
 ols_step_both_p(fit0)
+
+fit1 = lm(crew ~ age + tonnage + passengers + length + cabins + passdens + 
+          I(age^2) + I(tonnage^2) + I(passengers^2) + I(length^2) + I(cabins^2) + I(passdens^2) + 
+          age*tonnage + age*passengers + age*length + age*cabins + age*passdens + 
+          tonnage*passengers + tonnage*length + tonnage*cabins + tonnage*passdens + 
+          passengers*length + passengers*cabins + passengers*passdens + 
+          length*cabins + length*passdens + 
+          cabins*passdens, data=cruise)
+ols_step_forward_p(fit1)
