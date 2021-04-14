@@ -15,3 +15,8 @@ t(coef(ridge))
 
 ols = lm(bodyfat ~ triceps + thigh + midarm, data=bodyfat_data)
 coef(ols)
+
+ridge_yhat = predict(ridge, newx=x)
+
+mean(ols$residuals^2)
+mean((y-ridge_yhat)^2)
