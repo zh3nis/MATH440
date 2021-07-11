@@ -1,0 +1,147 @@
+\documentclass{beamer}
+
+\usepackage{verbatim}
+\usepackage{fancyvrb}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{calc}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{wrapfig}
+\usepackage{natbib}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{animate}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{xfrac}
+
+% two col: two columns
+\newenvironment{twocol}[4]{
+\begin{columns}[c]
+\column{#1\textwidth}
+#3
+\column{#2\textwidth}
+#4
+\end{columns}
+}
+
+\makeatletter
+\setbeamertemplate{theorem begin}
+{%
+\begin{\inserttheoremblockenv}
+  {}{\usebeamerfont*{block title}\usebeamercolor[fg]{block title}%
+  \inserttheoremname
+  %\inserttheoremnumber
+  \ifx \inserttheoremaddition \empty \else\ (\inserttheoremaddition)\fi
+  \inserttheorempunctuation}
+  \normalfont
+  }
+  \setbeamertemplate{theorem end}{\end{\inserttheoremblockenv}}
+\makeatother
+
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\s}{\mathrm{s}}
+\newcommand{\Corr}{\mathrm{Corr}}
+\newcommand{\rank}{\mathrm{rank}}
+\newcommand{\nullspace}{\mathrm{null}}
+\newcommand{\myspan}{\mathrm{span}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\softmax}{softmax}
+
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+
+\newtheorem{prop}[theorem]{Proposition}
+\newtheorem{exe}{Exercise}
+\newtheorem{remark}{Remark}
+\newtheorem{myproof}{Proof}
+
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+
+\title{Simultaneous Inference}
+\author{Zhenisbek Assylbekov}
+\institute{Department of Mathematics}
+\date{Regression Analysis}
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Main Idea}
+If a 95\% CI is created for $\beta_0$ and another 95\% CI for $\beta_1$, \pause we cannot say that we are 95\% confident that these two confidence intervals are \textit{simultaneously both} correct.
+\end{frame}
+
+\begin{frame}{Controlling the Error Rate}
+Let $\alpha$ be a significance level for each of the $g$ tests that we are planning to conduct.\\~\\
+
+\pause Assume we wish to combine all the individual tests into a combined/simultaneous test
+$$
+\mathrm{H}_0={\mathrm{H}_0}_1\cap{\mathrm{H}_0}_2\cap\cdots\cap{\mathrm{H}_0}_g
+$$
+\pause $\mathrm{H}_0$ is rejected if any of the ${\mathrm{H}_0}_i$ is rejected.\\~\\
+
+\pause If each ${\mathrm{H}_0}_i$ is conducted independently, then the overall significance level is
+\begin{multline*}
+\alpha^\ast=\Pr(\text{Reject }\mathrm{H}_0\mid\mathrm{H}_0\text{ is true})=1-\Pr(\text{FTR }\mathrm{H}_0\mid\mathrm{H}_0)\\
+=1-\Pr(\cap_{i=1}^g\text{FTR }{\mathrm{H}_0}_i\mid\mathrm{H}_0)=1-\prod_{i=1}^g\Pr(\text{FTR }{\mathrm{H}_0}_i\mid\mathrm{H}_0)=1-(1-\alpha)^g
+\end{multline*}
+\end{frame}
+
+\begin{frame}{Bonferroni Correction}
+If we do not know whether the tests are independent,
+\begin{align*}
+1-\alpha^\ast&=\Pr(\text{FTR }\mathrm{H}_0\mid\mathrm{H}_0)=\Pr(\cap_{i=1}^g\text{FTR }{\mathrm{H}_0}_i\mid\mathrm{H}_0)\\
+&=1-\Pr(\cup_{i=1}^g \text{Rej }{\mathrm{H}_0}_i\mid\mathrm{H}_0)
+\ge1-\sum_{i=1}^g\underbrace{\Pr(\text{Rej }{\mathrm{H}_0}_i\mid\mathrm{H}_0)}_{\alpha}\\
+&=1-g\alpha\quad\Rightarrow\quad1-\alpha^\ast\ge1-g\alpha\quad\Rightarrow\quad\alpha^\ast\le g\alpha
+\end{align*}
+\pause Hence, $\alpha^\ast\le g\alpha$, and by choosing individual significance levels as
+$$
+\boxed{\alpha=\frac{\alpha^\ast}{g}}
+$$
+for a \textit{given} $\alpha^\ast$ we guarantee that the overall significance level will not exceed $\alpha^\ast$.
+\end{frame}
+
+\begin{frame}{Simultaneous Estimation of Mean Responses}
+\begin{itemize}
+    \item Bonferroni: Can be used for $g$ simultaneous CIs, each with $100\cdot(1-\alpha/g)\%$ confidence level:
+    $$
+    \hat{Y}\pm t_{1-\alpha/(2g),n-2}\cdot\s[\hat{Y}]
+    $$
+    \pause If $g$ is large, these intervals will be ``too'' wide for practical conclusions.
+    \item\pause Working-Hotelling: A confidence band is created for the entire regression line that can be used for any number of confidence intervals for means simultaneously:
+    $$
+    \hat{Y}\pm\sqrt{2F_{1-\alpha;2,n-2}}\cdot\s[\hat{Y}]
+    $$
+\end{itemize}    
+\end{frame}
+
+\begin{frame}{Simultaneous Predictions}
+\begin{itemize}
+    \item Bonferroni: Can be used for $g$ simultaneous PIs, each with $100\cdot(1-\alpha/g)\%$ confidence level:
+    $$
+    \hat{Y}\pm t_{1-\alpha/(2g),n-2}\cdot\s[b_0+b_1x+\epsilon]
+    $$
+    \pause If $g$ is large, these intervals will be ``too'' wide for practical conclusions.
+    \item Scheff\'e: Widely used method. Like the Bonferroni, the width increases as $g$ increases
+    $$
+    \hat{Y}\pm\sqrt{g F_{1-\alpha;g;n-2}}\cdot\s[b_0+b_1x+\epsilon]
+    $$
+\end{itemize}    
+\end{frame}
+
+\end{document}
